@@ -1,0 +1,8 @@
+Django
+django-filter
+django-pytest
+djangorestframework
+mysqlclient
+autopep8
+django-cors-headers
+pytz
