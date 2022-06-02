@@ -9,8 +9,12 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
+router.register(r'users', views.UserViewSet)
+router.register(r'groups', views.GroupViewSet)
+router.register(r'sondage', views.SondageViewSet)
+router.register(r'question', views.QuestionViewSet)
+router.register(r'questionLabel', views.QuestionLabelViewSet)
+router.register(r'answer', views.AnswerViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

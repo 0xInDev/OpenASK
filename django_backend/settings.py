@@ -33,9 +33,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:4200',
-    'http://185.98.139.153:8001',
-    'http://127.0.0.1:4200',
-    'http://192.168.1.24:8000',
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -94,10 +91,15 @@ WSGI_APPLICATION = 'django_backend.wsgi.application'
 
 DATABASES = {
     # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'OPTIONS': {
-    #         'read_default_file': './my.cnf',
-    #     },
+    #   'ENGINE': 'django.db.backends.mysql',
+    #    'NAME': 'open_sondage',
+    #    'USER': 'root',
+    #    'PASSWORD': '',
+    #    'HOST': '127.0.0.1',
+    #    'PORT': '3306',
+    #    'OPTIONS': {
+    #        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+    #    }
     # }
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
