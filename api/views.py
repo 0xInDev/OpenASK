@@ -25,7 +25,8 @@ from .forms import *
 from .serializers import *
 from django.core import serializers as serializersCor
 
-from .base.viewset_helper import BaseViewset, HasAdminRole, HasAgentRole
+from .base.viewset_helper import BaseViewset, HasAdminRole
+from django.db import transaction
 
 
 class UserViewSet(BaseViewset):
@@ -51,6 +52,7 @@ class SondageViewSet(BaseViewset):
     queryset = Sondage.objects.filter(state=True)
     serializer_class = sondage_serializer
 
+    # get one sondage data title, question, possible answer
     @action(detail=True, methods=['GET'])
     def getSondage(self, request, pk):
         id = self.get_object().id
@@ -62,10 +64,33 @@ class SondageViewSet(BaseViewset):
         print(sondage)
         return HttpResponse(json.dumps(sondage))
 
-    @action(detail=True, methods=['POST'])
+    # transactional function for add sondage with json include sondage, question and question label
+    # The format of json is in readme on github page of project
+    @action(detail=False, methods=['Post'])
+    @transaction.atomic
     def setSondage(self, request):
         data = request.data
-        print(request.data)
+        try:
+            with transaction.atomic():
+                user = User.objects.filter(id=data['user'])[0]
+                obj1 = Sondage(sondage=data['title'], user=user,
+                               description=data['description'])
+                obj1.save(force_insert=True)
+                for q in data['questions']:
+                    obj2 = Question(
+                        sondage=Sondage.objects.last(), question=q['question'], type=q['type'], description=q['description'])
+                    obj2.save()
+                    tab = []
+                    print(q)
+                    for rep in q['answers']:
+                        label = QuestionLabel(label=rep['label'],
+                                              question=Question.objects.last())
+                        tab.append(label)
+                    QuestionLabel.objects.bulk_create(tab)
+
+            return HttpResponse({"result": "Votre sondage a été enregistrer"})
+        except:
+            return HttpResponse({"result": "Votre sondage a été enregistrer"})
 
     def sqlListQuery(self, req):
         with connection.cursor() as cursor:

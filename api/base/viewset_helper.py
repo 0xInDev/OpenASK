@@ -14,14 +14,6 @@ class HasAdminRole(permissions.BasePermission):
         return user.groups.filter(name='ADMIN').exists()
 
 
-class HasAgentRole(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-
-        user = request.user
-        return user.groups.filter(name='TECHNICIEN').exists()
-
-
 class BaseViewset(viewsets.ModelViewSet):
 
     has_user_field = True
@@ -31,7 +23,7 @@ class BaseViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
     """ permission_classes = [permissions.IsAuthenticated,
-                          (HasAdminRole | HasAgentRole) | permissions.IsAdminUser] """
+                          (HasAdminRole ) | permissions.IsAdminUser] """
 
     def get_serializer_class(self):
         if len(self.serializer_classes) == 0:
