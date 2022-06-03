@@ -48,14 +48,17 @@ class QuestionLabel(base.BaseModel):
     label = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.question
+        return self.label
 
 
 class Answer(base.BaseModel):
-    question = base.foreign('Question')
-    reponse = models.CharField(max_length=255, null=True)
-    email = models.CharField(max_length=255, unique=True)
+    questionLabel = base.foreign('QuestionLabel')
+    response = models.CharField(max_length=255, null=True, default="")
+    email = models.CharField(max_length=255)
     #type = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.questionLabel
 
 
 # PRODUCT SESSION

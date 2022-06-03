@@ -1,3 +1,4 @@
+import email
 import os
 
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -91,6 +92,23 @@ class SondageViewSet(BaseViewset):
             return HttpResponse({"result": "Votre sondage a été enregistrer"})
         except:
             return HttpResponse({"result": "Votre sondage a été enregistrer"})
+
+    @action(detail=False, methods=['Post'])
+    @transaction.atomic
+    def setAnswer(self, request):
+        data = request.data
+        tab = []
+        sondage = Sondage.objects.filter(id=data['sondage'])[0]
+        for ans in data['answers']:
+            questionL = QuestionLabel.objects.filter(
+                id=ans['question_label'])[0]
+            print(type(questionL))
+            response = Answer(questionLabel=questionL,
+                              response=ans['label'], email=data['email'])
+            tab.append(response)
+        Answer.objects.bulk_create(tab)
+
+        return HttpResponse({"result": "Réponses enregistrer"})
 
     def sqlListQuery(self, req):
         with connection.cursor() as cursor:
