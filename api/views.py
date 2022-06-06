@@ -60,13 +60,25 @@ class SondageViewSet(viewsets.ModelViewSet):
     serializer_class = sondage_serializer
     filterset_fields = ['user']
 
+    # get questions and labels for a sondage
+    def getSondageData(self, id):
+        response = []
+        questions = Question.objects.filter(
+            sondage=id).values("id", "type", "question")
+        for label in questions:
+            labels = QuestionLabel.objects.filter(
+                question=label['id']).values("id", "label")
+            label['reponses'] = list(labels)
+            response.append(label)
+        return response
+
     # get one sondage data title, question, possible answer
     @action(detail=True, methods=['GET'])
     def getSondage(self, request, pk):
         id = self.get_object().id
         sondage = self.get_object()
         # get sondage with question and possible answer
-        allSondage = self.getAllSondage(id)
+        allSondage = self.getSondageData(id)
         results = {'id': sondage.id, 'user': sondage.user.id,
                    'description': sondage.description, 'title': sondage.sondage, "questions": allSondage}
         results = json.dumps(results)
@@ -100,6 +112,7 @@ class SondageViewSet(viewsets.ModelViewSet):
         except:
             return HttpResponse({"result": "Votre sondage a été enregistrer"})
 
+    # save answer of sondage
     @action(detail=False, methods=['Post'])
     @transaction.atomic
     def setAnswer(self, request):
@@ -125,21 +138,6 @@ class SondageViewSet(viewsets.ModelViewSet):
                 dict(zip(columns, row))
                 for row in cursor.fetchall()
             ]
-
-    def getAllSondage(self, id):
-        response = []
-        query = "select ask.id, ask.type, ask.question from api_question ask where ask.sondage_id=" + \
-            str(id)
-        questions = self.sqlListQuery(query)
-
-        for label in questions:
-            queryQuestionLabel = "select label.id, label.label from api_questionlabel label where label.question_id=" + \
-                str(label['id'])
-            labels = self.sqlListQuery(queryQuestionLabel)
-            label['reponses'] = labels
-            response.append(label)
-
-        return response
 
     def destroy(self, request, *args, **kwargs):
         if self.has_state:
