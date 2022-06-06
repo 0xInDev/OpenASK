@@ -52,13 +52,13 @@ class GroupViewSet(BaseViewset):
 class SondageViewSet(BaseViewset):
     queryset = Sondage.objects.filter(state=True)
     serializer_class = sondage_serializer
+    filterset_fields = ['user']
 
     # get one sondage data title, question, possible answer
     @action(detail=True, methods=['GET'])
     def getSondage(self, request, pk):
         id = self.get_object().id
         sondage = self.get_object()
-
         u = self.getAllSondage(id)
         sondage = {'id': sondage.id, 'user': sondage.user.id,
                    'description': sondage.description, 'title': sondage.sondage, "questions": u}
@@ -132,7 +132,7 @@ class SondageViewSet(BaseViewset):
             label['reponses'] = labels
             response.append(label)
 
-        return response
+        return HttpResponse({"result": response})
 
 
 class QuestionViewSet(BaseViewset):
@@ -149,6 +149,10 @@ class AnswerViewSet(BaseViewset):
     queryset = Answer.objects.filter(state=True)
     serializer_class = answer_serializer
     permission_classes = [permissions.AllowAny]
+
+    @action(detail=True, methods=['GET'])
+    def countResponseSondage(self, request, pk):
+        Answer.objects.filter()
 
 
 def handle_uploaded_file(f, name):
