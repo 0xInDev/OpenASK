@@ -1,35 +1,60 @@
+from attr import field
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.hashers import make_password
 from numpy import product
 from .models import *
 from rest_framework import serializers
 
-from .base import serialize_helper as sz
+
+class permission_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
+
+    class Meta:
+        model = Permission
 
 
-permission_serializer = sz.generate_serializer(Permission)
+class group_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
+
+    class Meta:
+        model = Group
+        exclude = ['permissions']
 
 
-group_serializer = sz.generate_serializer(
-    Group, ['permissions'], g_serializer=serializers.ModelSerializer)
+class sondage_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
 
-sondage_serializer = sz.generate_serializer(Sondage)
-
-question_serializer = sz.generate_serializer(Question)
-
-question_label_serializer = sz.generate_serializer(QuestionLabel)
-
-answer_serializer = sz.generate_serializer(Answer)
+    class Meta:
+        model = Sondage
+        fields = '__all__'
 
 
-class UserSerializer(sz.DefaultSerializer):
+class question_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
 
-    password = serializers.CharField(
-        write_only=True,
-        required=False,
-        help_text='Leave empty if no change needed',
-        style={'input_type': 'password', 'placeholder': 'Password'}
-    )
+    class Meta:
+        model = Question
+        fields = '__all__'
+
+
+class question_label_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
+
+    class Meta:
+        model = QuestionLabel
+        fields = '__all__'
+
+
+class answer_serializer(serializers.ModelSerializer):
+    state = serializers.HiddenField(default=True)
+
+    class Meta:
+        model = Answer
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+
     password = serializers.CharField(
         write_only=True,
         required=False,
@@ -49,7 +74,6 @@ class UserSerializer(sz.DefaultSerializer):
 
     def update(self, instance, validated_data):
         if 'password' in validated_data:
-            #print(validated_data )
             validated_data['password'] = make_password(
                 validated_data.get('password'))
         return super().update(instance, validated_data)

@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from django.shortcuts import render
 from django.conf import settings
 
-
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.authtoken.models import Token
@@ -26,30 +25,37 @@ from .forms import *
 from .serializers import *
 from django.core import serializers as serializersCor
 
-from .base.viewset_helper import BaseViewset, HasAdminRole
 from django.db import transaction
 
 
-class UserViewSet(BaseViewset):
-
+class UserViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
     queryset = User.objects.filter(is_active=True).order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser | HasAdminRole]
+    permission_classes = [permissions.IsAdminUser]
     has_user_field = False
     has_state = False
     filterset_fields = ["groups"]
 
 
-class GroupViewSet(BaseViewset):
-
+class GroupViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
     queryset = Group.objects.all()
     serializer_class = group_serializer
-    permission_classes = [permissions.IsAdminUser | HasAdminRole]
+    permission_classes = [permissions.IsAdminUser]
     has_user_field = False
     has_state = False
 
 
-class SondageViewSet(BaseViewset):
+class SondageViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
+    permission_classes = [permissions.AllowAny]
     queryset = Sondage.objects.filter(state=True)
     serializer_class = sondage_serializer
     filterset_fields = ['user']
@@ -59,11 +65,12 @@ class SondageViewSet(BaseViewset):
     def getSondage(self, request, pk):
         id = self.get_object().id
         sondage = self.get_object()
-        u = self.getAllSondage(id)
-        sondage = {'id': sondage.id, 'user': sondage.user.id,
-                   'description': sondage.description, 'title': sondage.sondage, "questions": u}
-        print(sondage)
-        return HttpResponse(json.dumps(sondage))
+        # get sondage with question and possible answer
+        allSondage = self.getAllSondage(id)
+        results = {'id': sondage.id, 'user': sondage.user.id,
+                   'description': sondage.description, 'title': sondage.sondage, "questions": allSondage}
+        results = json.dumps(results)
+        return HttpResponse(results)
 
     # transactional function for add sondage with json include sondage, question and question label
     # The format of json is in readme on github page of project
@@ -132,20 +139,59 @@ class SondageViewSet(BaseViewset):
             label['reponses'] = labels
             response.append(label)
 
-        return HttpResponse({"result": response})
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        if self.has_state:
+            instance = self.get_object()
+            instance.state = False
+            instance.save()
+        else:
+            return super().destroy(request, *args, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class QuestionViewSet(BaseViewset):
+class QuestionViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
+    permission_classes = [permissions.AllowAny]
     queryset = Question.objects.filter(state=True)
     serializer_class = question_serializer
 
+    def destroy(self, request, *args, **kwargs):
+        if self.has_state:
+            instance = self.get_object()
+            instance.state = False
+            instance.save()
+        else:
+            return super().destroy(request, *args, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-class QuestionLabelViewSet(BaseViewset):
+
+class QuestionLabelViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
+    permission_classes = [permissions.AllowAny]
     queryset = QuestionLabel.objects.filter(state=True)
     serializer_class = question_label_serializer
 
+    def destroy(self, request, *args, **kwargs):
+        if self.has_state:
+            instance = self.get_object()
+            instance.state = False
+            instance.save()
+        else:
+            return super().destroy(request, *args, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-class AnswerViewSet(BaseViewset):
+
+class AnswerViewSet(viewsets.ModelViewSet):
+    has_user_field = True
+    has_state = True
+    filter_backends = [DjangoFilterBackend]
+    permission_classes = [permissions.AllowAny]
     queryset = Answer.objects.filter(state=True)
     serializer_class = answer_serializer
     permission_classes = [permissions.AllowAny]
@@ -154,32 +200,14 @@ class AnswerViewSet(BaseViewset):
     def countResponseSondage(self, request, pk):
         Answer.objects.filter()
 
-
-def handle_uploaded_file(f, name):
-    path = os.path.join(settings.MEDIA_ROOT, name)
-    with open(path, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-
-@csrf_exempt
-def list(request):
-    if request.method == 'POST':
-        form = DocumentForm(request.POST, request.FILES)
-        if form.is_valid():
-            ext = request.FILES['file'].name.split(".")[-1]
-            if len(request.FILES['file'].name.split(".")) < 2:
-                ext = "png"
-            save_name = str(uuid.uuid4()) + "." + ext
-            if ext in ["mp4", "jpg", "jpeg", "png", "gif"]:
-                handle_uploaded_file(request.FILES['file'], save_name)
-            else:
-                return HttpResponse(json.dumps({'status': 'Incorrect ext'}))
-            return HttpResponse(json.dumps({'status': 'ok', 'file': save_name}))
-    else:
-        form = DocumentForm()  # A empty, unbound form
-
-    return render(request, 'upload.html', {'form': form})
+    def destroy(self, request, *args, **kwargs):
+        if self.has_state:
+            instance = self.get_object()
+            instance.state = False
+            instance.save()
+        else:
+            return super().destroy(request, *args, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

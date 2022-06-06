@@ -22,8 +22,6 @@ class BaseViewset(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
-    """ permission_classes = [permissions.IsAuthenticated,
-                          (HasAdminRole ) | permissions.IsAdminUser] """
 
     def get_serializer_class(self):
         if len(self.serializer_classes) == 0:
