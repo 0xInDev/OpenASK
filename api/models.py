@@ -36,7 +36,6 @@ class Question(models.Model):
     sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
     question = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True)
-    #user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.RESTRICT, default=None)
     type = models.IntegerField(
         choices=((0, 'one_choice'), (1, 'multiple_choice'), (3, 'number'), (2, 'text')), default=0)
 
@@ -60,7 +59,9 @@ class Answer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     questionLabel = models.ForeignKey(
-        'QuestionLabel', on_delete=models.RESTRICT)
+        'QuestionLabel', on_delete=models.RESTRICT, blank=True, null=True)
+    question = models.ForeignKey(
+        'Question', on_delete=models.RESTRICT, blank=True, null=True)
     response = models.CharField(max_length=255, null=True, default="")
     email = models.CharField(max_length=255)
 
@@ -68,4 +69,3 @@ class Answer(models.Model):
         return self.questionLabel
 
 
-# PRODUCT SESSION

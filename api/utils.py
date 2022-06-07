@@ -1,23 +1,18 @@
-import datetime
+from django.db import connection
 
-one_day = datetime.timedelta(days=1)
+def keyExistAndLength(obj, key, minLength):
+    try:
+        if key in obj :
+            if len(obj[key]) >= minLength:
+                return True
+    except:
+        return False
 
-
-def get_week(date):
-    """Return the full week (Sunday first) of the week containing the given date.
-
-    'date' may be a datetime or date instance (the same type is returned).
-    """
-    day_idx = (date.weekday()+2) % 7  # 7 turn sunday into 0, monday into 1, etc.
-    saturday = date - datetime.timedelta(day_idx) #saturday
-    date = saturday
-    data = []
-    for n in range(7):
-        data.append(date)
-        date += one_day
-    print(data)
-    return data
-
-
-def get_week_name(mon, sun):
-    return 'Le {} {} - {} {} {}'.format(mon.day, mon.strftime("%b"), sun.day, sun.strftime("%b"), sun.year)
+def sqlListQuery( req):
+        with connection.cursor() as cursor:
+            cursor.execute(req)
+            columns = [col[0] for col in cursor.description]
+            return [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]

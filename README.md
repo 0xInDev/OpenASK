@@ -27,8 +27,7 @@ http://your_address/swagger-docs/ for the swagger api documentation
 # User creation
 
 ## Sign up
-
-    environment.api = your_address
+    ```
     auth = {
         username: '',
         first_name: '',
@@ -37,23 +36,26 @@ http://your_address/swagger-docs/ for the swagger api documentation
         email: '',
         groups: ''
     }
+
     signUp(auth: any): Observable<any> {
         return this.http.post<any>(`your_address/users/?format=json`, auth);
-    }
+    }```
 
 ## Sign in
-
+```
 auth = {
   username: '',
   password: ''
-  }
-  signIn(auth: any): Observable<any> {
+}
+
+signIn(auth: any): Observable<any> {
   return this.http.post<any>(`your_address/api-token-auth/`, auth);
-  }
-You need to add authentification token to all secure route
-  this.xhr = req.clone({
-  headers: req.headers.set('Authorization', "token "+ this.token)
-  });
+}```
+
+You need to add authentification token to all secure route header like this
+  
+('Authorization', "token "+ your_token)
+
 
 # Sondage
 
@@ -69,7 +71,7 @@ url : http://your_address/sondage/setSondage/
     "title": "Sondage sur l'utilisation des réseaux sociaux au Mali",
     "questions": [
         {
-            "type": 1,
+            "type": 0,
             "description": "",
             "question": "Avez vous déja utilisé un reseau social ?",
             "answers": [
@@ -82,7 +84,7 @@ url : http://your_address/sondage/setSondage/
             ]
         },
         {
-            "type": 2,
+            "type": 1,
             "description": "",
             "question": "Si vous avez déja utilisé lesquels ?",
             "answers": [
@@ -182,12 +184,14 @@ url : http://your_address/sondage/setAnswer/
         {
             "id_question": 5,
             "question_label": 17,
-            "label": ""
+            "response": ""
         },
         {
             "id_question": 6,
             "question_label": 20,
-            "label": ""
+            "response": "",
+            //You add responses if the question is a multiple choice with array of checked values id
+            "responses":[4,2,8]
         }
     ]
 }```
