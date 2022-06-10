@@ -158,8 +158,8 @@ class SondageViewSet(viewsets.ModelViewSet):
 
         return JsonResponse({"result": "Réponses enregistrer"})
 
-    
-    
+
+
     #on destroy implement logic delete by change state to false
     def destroy(self, request, *args, **kwargs):
         if self.has_state:

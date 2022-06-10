@@ -11,7 +11,7 @@ class Sondage(models.Model):
     description = models.TextField(max_length=255, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.RESTRICT, default=None)
-    
+
     strictValidation = models.BooleanField(default=False)
     state = models.IntegerField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -21,7 +21,7 @@ class Sondage(models.Model):
 
 
 class Question(models.Model):
-    
+
     sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
     question = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True)
@@ -37,7 +37,7 @@ class Question(models.Model):
 
 class Answer(models.Model):
     state = models.BooleanField(default=True)
-    
+
     question = models.ForeignKey(
         'Question', on_delete=models.RESTRICT, blank=True, null=True)
     response = models.CharField(max_length=255, null=True, default="")
