@@ -6,3 +6,4 @@ mysqlclient
 autopep8
 django-cors-headers
 pytz
+coreapi
