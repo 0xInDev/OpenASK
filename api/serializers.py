@@ -37,14 +37,6 @@ class question_serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class question_label_serializer(serializers.ModelSerializer):
-    state = serializers.HiddenField(default=True)
-
-    class Meta:
-        model = QuestionLabel
-        fields = '__all__'
-
-
 class answer_serializer(serializers.ModelSerializer):
     state = serializers.HiddenField(default=True)
 

@@ -189,24 +189,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class QuestionLabelViewSet(viewsets.ModelViewSet):
-    has_user_field = True
-    has_state = True
-    filter_backends = [DjangoFilterBackend]
-    permission_classes = [permissions.AllowAny]
-    queryset = QuestionLabel.objects.filter(state=True)
-    serializer_class = question_label_serializer
-
-    def destroy(self, request, *args, **kwargs):
-        if self.has_state:
-            instance = self.get_object()
-            instance.state = False
-            instance.save() 
-        else:
-            return super().destroy(request, *args, **kwargs)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class AnswerViewSet(viewsets.ModelViewSet):
     has_user_field = True
     has_state = True

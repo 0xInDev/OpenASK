@@ -8,7 +8,7 @@ def logged_user(request):
 
 class Sondage(models.Model):
     sondage = models.CharField(max_length=255)
-    description = models.Text(max_length=255, null=True)
+    description = models.TextField(max_length=255, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.RESTRICT, default=None)
     
