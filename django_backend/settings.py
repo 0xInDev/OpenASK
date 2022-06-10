@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:4200',
+    'http://localhost:8000',
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'django_filters',
-    'rest_framework_swagger'
 ]
 
 MIDDLEWARE = [

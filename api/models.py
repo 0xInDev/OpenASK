@@ -1,13 +1,5 @@
-from email.policy import default
-from statistics import mode
-from unicodedata import name
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 from django.conf import settings
-import json
-from datetime import date
-
 
 def logged_user(request):
     current_user = request.user
@@ -37,7 +29,7 @@ class Question(models.Model):
     question = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True)
     type = models.IntegerField(
-        choices=((0, 'one_choice'), (1, 'multiple_choice'), (3, 'number'), (2, 'text')), default=0)
+        choices=((0, 'CHOICE'), (1, 'CHOICES'), (3, 'NUMBER'), (2, 'TEXT')), default=0)
 
     def __str__(self):
         return self.question

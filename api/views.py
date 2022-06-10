@@ -1,13 +1,11 @@
 import email
 import os
 
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
 from django.template import RequestContext
 from django.http import HttpResponse, JsonResponse
 from django.dispatch import receiver
-from django.shortcuts import render
 from django.conf import settings
 
 from rest_framework import viewsets
@@ -18,13 +16,10 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db import connection
 
 from .models import *
-from .forms import *
 from .utils import *
 from .serializers import *
-from django.core import serializers as serializersCor
 
 from django.db import transaction
 
