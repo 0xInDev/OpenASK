@@ -12,12 +12,12 @@ class Sondage(models.Model):
         Verification level 1 : give to any visitor to add new sondage answer without any verification
         Verification level 2 : check the unicity of email address in sondage answer
         Verificaiton level 3 : Email verification with validation code is asked.
-    
+
     """
     libelle = models.CharField(max_length=255)
     description = models.TextField(null=True)
     verification = models.IntegerField(choices=((1, 'NO VERIFICATION'), (2, 'MI-STRICT'), (3, 'STRICT')), default=0)
-   
+
     actif = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -32,7 +32,7 @@ class Question(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
 
     def __str__(self):
@@ -60,7 +60,7 @@ class ResponseProposal(models.Model):
 class Response(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
     person = models.ForeignKey('Person', on_delete=models.RESTRICT, blank=False, null=False)
 
@@ -75,7 +75,7 @@ class QuestionResponse(models.Model):
     choices_response = models.TextField(null=True, blank=True)
     number_response = models.IntegerField(null=True, blank=True)
     text_response = models.TextField(null=True, blank=True)
-    
+
     question = models.ForeignKey('Question', on_delete=models.RESTRICT, blank=False, null=False)
     response = models.ForeignKey('Response', on_delete=models.RESTRICT, blank=False, null=False)
 
