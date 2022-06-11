@@ -11,7 +11,10 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'sondage', views.SondageViewSet)
 router.register(r'question', views.QuestionViewSet)
-#router.register(r'answer', views.AnswerViewSet)
+router.register(r'person', views.PersonViewSet)
+router.register(r'response', views.ResponseViewSet)
+router.register(r'response_proposal', views.ResponseProposalViewSet)
+router.register(r'question_response', views.QuestionResponseViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
