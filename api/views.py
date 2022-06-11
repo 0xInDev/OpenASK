@@ -52,7 +52,7 @@ class SondageViewSet(viewsets.ModelViewSet):
     has_state = True
     filter_backends = [DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
-    queryset = Sondage.objects.filter(state=True)
+    queryset = Sondage.objects.filter(actif=True)
     serializer_class = sondage_serializer
     filterset_fields = ['user']
 
@@ -176,7 +176,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     has_state = True
     filter_backends = [DjangoFilterBackend]
     permission_classes = [permissions.AllowAny]
-    queryset = Question.objects.filter(state=True)
+    queryset = Question.objects.all()
     serializer_class = question_serializer
 
     def destroy(self, request, *args, **kwargs):
@@ -189,27 +189,27 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class AnswerViewSet(viewsets.ModelViewSet):
-    has_user_field = True
-    has_state = True
-    filter_backends = [DjangoFilterBackend]
-    permission_classes = [permissions.AllowAny]
-    queryset = Answer.objects.filter(state=True)
-    serializer_class = answer_serializer
-    permission_classes = [permissions.AllowAny]
+# class AnswerViewSet(viewsets.ModelViewSet):
+#     has_user_field = True
+#     has_state = True
+#     filter_backends = [DjangoFilterBackend]
+#     permission_classes = [permissions.AllowAny]
+#     queryset = Answer.objects.filter(state=True)
+#     serializer_class = answer_serializer
+#     permission_classes = [permissions.AllowAny]
 
-    @action(detail=True, methods=['GET'])
-    def countResponseSondage(self, request, pk):
-        Answer.objects.filter()
+#     @action(detail=True, methods=['GET'])
+#     def countResponseSondage(self, request, pk):
+#         Answer.objects.filter()
 
-    def destroy(self, request, *args, **kwargs):
-        if self.has_state:
-            instance = self.get_object()
-            instance.state = False
-            instance.save()
-        else:
-            return super().destroy(request, *args, **kwargs)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     def destroy(self, request, *args, **kwargs):
+#         if self.has_state:
+#             instance = self.get_object()
+#             instance.state = False
+#             instance.save()
+#         else:
+#             return super().destroy(request, *args, **kwargs)
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

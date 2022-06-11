@@ -35,12 +35,12 @@ class question_serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class answer_serializer(serializers.ModelSerializer):
-    state = serializers.HiddenField(default=True)
+# class answer_serializer(serializers.ModelSerializer):
+#     state = serializers.HiddenField(default=True)
 
-    class Meta:
-        model = Answer
-        fields = '__all__'
+#     class Meta:
+#         model = Answer
+#         fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
