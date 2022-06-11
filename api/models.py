@@ -1,71 +1,85 @@
-from email.policy import default
-from statistics import mode
-from unicodedata import name
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 from django.conf import settings
-import json
-from datetime import date
-
 
 def logged_user(request):
-    current_user = request.user
+    current_user = request.user 
     return current_user
 
 
 class Sondage(models.Model):
-    state = models.BooleanField(default=True)
+    """
+    verificaiton:    
+        Verification level 1 : give to any visitor to add new sondage answer without any verification
+        Verification level 2 : check the unicity of email address in sondage answer
+        Verificaiton level 3 : Email verification with validation code is asked.
+
+    """
+    libelle = models.CharField(max_length=255)
+    description = models.TextField(null=True)
+    verification = models.IntegerField(choices=((1, 'NO VERIFICATION'), (2, 'MI-STRICT'), (3, 'STRICT')), default=0)
+
+    actif = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    sondage = models.CharField(max_length=255)
-    description = models.CharField(max_length=255, null=True)
-    theme = models.JSONField(default=dict)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    author = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.RESTRICT, default=None)
-
     def __str__(self):
-        return self.sondage
-
+        return self.libelle
 
 class Question(models.Model):
-    state = models.BooleanField(default=True)
+    libelle = models.CharField(max_length=255)
+    type_response = models.IntegerField(choices=((0, 'CHOICE'), (1, 'CHOICES'), (3, 'NUMBER'), (2, 'TEXT')), default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
-    question = models.CharField(max_length=255)
-    description = models.CharField(max_length=255, null=True)
-    type = models.IntegerField(
-        choices=((0, 'one_choice'), (1, 'multiple_choice'), (3, 'number'), (2, 'text')), default=0)
 
     def __str__(self):
-        return self.question
+        return self.libelle
 
+class Person(models.Model):
+    first_name = models.CharField(max_length=255, null=True)
+    last_name = models.CharField(max_length=255, null=True)
+    email = models.CharField(max_length=255, null=True)
 
-class QuestionLabel(models.Model):
-    state = models.BooleanField(default=True)
+    def __str__(self):
+        if self.email == None:
+            return "Person {}".format(self.id)
+        return "Person {}".format(self.email)
+
+class ResponseProposal(models.Model):
+    libelle = models.CharField(max_length=255, null=True)
+    value = models.BooleanField(null=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    question = models.ForeignKey('Question', on_delete=models.RESTRICT)
-    label = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.label
+    question = models.ForeignKey('Question', on_delete=models.RESTRICT, blank=False, null=False)
 
-
-class Answer(models.Model):
-    state = models.BooleanField(default=True)
+class Response(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    questionLabel = models.ForeignKey(
-        'QuestionLabel', on_delete=models.RESTRICT, blank=True, null=True)
-    question = models.ForeignKey(
-        'Question', on_delete=models.RESTRICT, blank=True, null=True)
-    response = models.CharField(max_length=255, null=True, default="")
-    email = models.CharField(max_length=255)
+
+    sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
+    person = models.ForeignKey('Person', on_delete=models.RESTRICT, blank=False, null=False)
 
     def __str__(self):
-        return self.questionLabel
+        return "Response: {}".format(self.id)
+
+class QuestionResponse(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    choice_response = models.TextField(null=True, blank=True)
+    choices_response = models.TextField(null=True, blank=True)
+    number_response = models.IntegerField(null=True, blank=True)
+    text_response = models.TextField(null=True, blank=True)
+
+    question = models.ForeignKey('Question', on_delete=models.RESTRICT, blank=False, null=False)
+    response = models.ForeignKey('Response', on_delete=models.RESTRICT, blank=False, null=False)
+
+    def __str__(self):
+        return "Response: {}".format(self.id)
 
 
