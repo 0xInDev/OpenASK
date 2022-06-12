@@ -75,7 +75,7 @@ class SondageViewSet(viewsets.ModelViewSet):
 				question = question_response.question
 				_question_response_data = {"question_libelle":question.libelle, "question_id": question.id}
 				if question.type_response == 0:
-					_question_response_data['response'] = json.loads(question_response.choice_response)
+					_question_response_data['response'] = int(question_response.choice_response)
 				elif question.type_response == 1:
 					_question_response_data['response'] = json.loads(question_response.choices_response)
 				elif question.type_response == 2:
