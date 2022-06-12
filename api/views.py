@@ -93,7 +93,29 @@ class SondageViewSet(viewsets.ModelViewSet):
 
 		data['sondage']['questions'] = _questions
 		data['sondage']['responses'] = _responses
+		return RestReponse(data)
+	@action(detail=True)
+	def details(self, request, pk=None):
+		sondage = self.get_object()
+		data = {}
+		data['sondage'] = SondageSerializer(sondage, context={"request":request}).data
+		_questions = []
+		for question in Question.objects.filter(sondage=sondage):
+			question_data = {
+				"id": question.id, 
+				"libelle": question.libelle, 
+				"type_response": question.type_response
+			}
 
+			if question.type_response == 1 or question.type_response == 2:
+				_response_proposal = []
+				for response_proposal in ResponseProposal.objects.filter(question=question):
+					_response_proposal.append({"libelle":response_proposal.libelle})
+				question_data['response_proposal'] = _response_proposal
+			_questions.append(question_data)
+
+
+		data['sondage']['questions'] = _questions
 		return RestReponse(data)
 
 class QuestionViewSet(viewsets.ModelViewSet):
