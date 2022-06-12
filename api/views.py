@@ -107,7 +107,7 @@ class SondageViewSet(viewsets.ModelViewSet):
 				"type_response": question.type_response
 			}
 
-			if question.type_response == 1 or question.type_response == 2:
+			if question.type_response == 0 or question.type_response == 1:
 				_response_proposal = []
 				for response_proposal in ResponseProposal.objects.filter(question=question):
 					_response_proposal.append({"libelle":response_proposal.libelle})
