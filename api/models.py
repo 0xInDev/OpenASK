@@ -28,7 +28,7 @@ class Sondage(models.Model):
 
 class Question(models.Model):
     libelle = models.CharField(max_length=255)
-    type_response = models.IntegerField(choices=((0, 'CHOICE'), (1, 'CHOICES'), (3, 'NUMBER'), (2, 'TEXT')), default=0)
+    type_response = models.IntegerField(choices=((0, 'CHOICE'), (1, 'CHOICES'), (2, 'TEXT'), (3, 'NUMBER')), default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -39,9 +39,9 @@ class Question(models.Model):
         return self.libelle
 
 class Person(models.Model):
-    first_name = models.CharField(max_length=255, null=True)
-    last_name = models.CharField(max_length=255, null=True)
-    email = models.CharField(max_length=255, null=True)
+    first_name = models.CharField(max_length=255, null=True, blank=True)
+    last_name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         if self.email == None:
@@ -49,7 +49,7 @@ class Person(models.Model):
         return "Person {}".format(self.email)
 
 class ResponseProposal(models.Model):
-    libelle = models.CharField(max_length=255, null=True)
+    libelle = models.CharField(max_length=255, null=False, default="")
     value = models.BooleanField(null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -71,7 +71,7 @@ class QuestionResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    choice_response = models.TextField(null=True, blank=True)
+    choice_response = models.IntegerField(null=True, blank=True)
     choices_response = models.TextField(null=True, blank=True)
     number_response = models.IntegerField(null=True, blank=True)
     text_response = models.TextField(null=True, blank=True)
