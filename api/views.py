@@ -228,7 +228,7 @@ class ResponseViewSet(viewsets.ModelViewSet):
 				if res == "" or res == None:
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
-					QuestionResponse.objects.create(**{"choice_responses": res, "question": question, "response": response_obj})
+					QuestionResponse.objects.create(**{"choices_response": res, "question": question, "response": response_obj})
 				except Exception as e:
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 			elif question.type_response == 2:
