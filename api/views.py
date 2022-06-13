@@ -64,7 +64,7 @@ class SondageViewSet(viewsets.ModelViewSet):
 					"id": question.id, 
 					"libelle": question.libelle, 
 					"type_response": question.type_response
-					})
+				})
 		_responses = []
 
 		for response in Response.objects.filter(sondage=sondage):
@@ -106,7 +106,6 @@ class SondageViewSet(viewsets.ModelViewSet):
 				"libelle": question.libelle, 
 				"type_response": question.type_response
 			}
-
 			if question.type_response == 0 or question.type_response == 1:
 				_response_proposal = []
 				for response_proposal in ResponseProposal.objects.filter(question=question):
@@ -228,7 +227,7 @@ class ResponseViewSet(viewsets.ModelViewSet):
 				if res == "" or res == None:
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
-					QuestionResponse.objects.create(**{"choices_response": res, "question": question, "response": response_obj})
+					QuestionResponse.objects.create(**{"choices_response": json.loads(res), "question": question, "response": response_obj})
 				except Exception as e:
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 			elif question.type_response == 2:

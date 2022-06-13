@@ -22,7 +22,7 @@ class Sondage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.RESTRICT, default=None)
+                             on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.libelle
 
@@ -33,7 +33,7 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
+    sondage = models.ForeignKey('Sondage', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.libelle
@@ -55,14 +55,14 @@ class ResponseProposal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    question = models.ForeignKey('Question', on_delete=models.RESTRICT, blank=False, null=False)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, blank=False, null=False)
 
 class Response(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    sondage = models.ForeignKey('Sondage', on_delete=models.RESTRICT)
-    person = models.ForeignKey('Person', on_delete=models.RESTRICT, blank=False, null=False)
+    sondage = models.ForeignKey('Sondage', on_delete=models.CASCADE)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE, blank=False, null=False)
 
     def __str__(self):
         return "Response: {}".format(self.id)
@@ -76,8 +76,8 @@ class QuestionResponse(models.Model):
     number_response = models.IntegerField(null=True, blank=True)
     text_response = models.TextField(null=True, blank=True)
 
-    question = models.ForeignKey('Question', on_delete=models.RESTRICT, blank=False, null=False)
-    response = models.ForeignKey('Response', on_delete=models.RESTRICT, blank=False, null=False)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, blank=False, null=False)
+    response = models.ForeignKey('Response', on_delete=models.CASCADE, blank=False, null=False)
 
     def __str__(self):
         return "Response: {}".format(self.id)
