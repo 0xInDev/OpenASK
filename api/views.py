@@ -202,47 +202,63 @@ class ResponseViewSet(viewsets.ModelViewSet):
 
 		sondage = Sondage.objects.filter(id=int(data['sondage'])).first()
 		check_existing_person = Person.objects.filter(email=data['person']['email'])
+		isNewPerson = False
 		if len(check_existing_person) > 0:
 			person = check_existing_person.first()
 			if len(Response.objects.filter(person=person)) > 0:
 				return RestReponse({'error':'This person already reply to this sondage'})
+			else:
+				isNewPerson = False
 		else:
 			person = Person.objects.create(**safeCheck(data['person']))
+			isNewPerson = True
 		response_obj = Response.objects.create(**{"person":person, "sondage":sondage})
+
+		def resetResponse():
+			response_obj.delete()
 		
 		for response in data['responses']:
 			question = Question.objects.filter(id=response)
 			if len(question) == 0:
+				resetResponse()
 				return RestReponse({'error':'Innexistante question; question_id => {}; response => {}'.format(response, data['responses'][response])})
 			question = question.first()
 			res = data['responses'][response]
 			if question.type_response == 0:
 				if res == "" or res == None:
+					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
 					QuestionResponse.objects.create(**{"choice_response": int(res), "question": question, "response": response_obj})
 				except Exception as e:
+					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 			elif question.type_response == 1:
 				if res == "" or res == None:
+					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
 					QuestionResponse.objects.create(**{"choices_response": json.loads(res), "question": question, "response": response_obj})
 				except Exception as e:
+					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 			elif question.type_response == 2:
 				if res == "" or res == None:
+					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
 					QuestionResponse.objects.create(**{"text_response": res, "question": question, "response": response_obj})
 				except Exception as e:
+					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 			elif question.type_response == 3:
 				if res == "" or res == None:
+					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
 					QuestionResponse.objects.create(**{"number_response": int(res), "question": question, "response": response_obj})
 				except Exception as e:
+					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 
 		return RestReponse({"status": 200})
