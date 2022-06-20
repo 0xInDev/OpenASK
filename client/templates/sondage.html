@@ -250,7 +250,7 @@
 	`
 	var numberSamples = `
 	<div>
-	  <input class="text_input" type="number" onkeydown="return isNumberKey(event)" name="number#question_id" pattern='[0-9]{10}' id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	  <input class="text_input" type="number" onkeydown="return isNumberKey(event)" name="number#question_id"  id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
 	</div>
 	`
 
@@ -266,8 +266,8 @@
 	function isNumberKey(evt) {
 		var charCode =  event.key;
 		number = ['0','1','2','3','4','5','6','7','8','9', 'Backspace']
-		console.log(charCode)
-		console.log(number.includes(charCode))
+		
+		if(evt.target.value.length > 15 && charCode != 'Backspace'){return false}
 
 		if (number.includes(charCode))
 			return true;
