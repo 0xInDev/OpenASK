@@ -240,7 +240,12 @@ class ResponseViewSet(viewsets.ModelViewSet):
 					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
-					QuestionResponse.objects.create(**{"choices_response": json.loads(res), "question": question, "response": response_obj})
+					print('before convert {} {}'.format(res, type(res)))
+					if type(res) == list:
+						QuestionResponse.objects.create(**{"choices_response": json.dumps(res), "question": question, "response": response_obj})
+					else:
+						resetResponse()
+						return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 				except Exception as e:
 					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
