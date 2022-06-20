@@ -1,27 +1,42 @@
+{% load static %}
 <div class="background">
+	<canvas id='c'></canvas>
 	<div class="box">
-		<h1 id="sondageName">Nom sondage</h1>
+		<img src="{% static 'img/logo.png' %}" width="100">
+		<br><br>
+		<div id="quest_zero">
+			<br><br>
+		<h3 id="sondageName">Nom sondage</h3>
 		<p id="sondageDescription">Description...</p>
-		<hr>
-		<div id="quest_0">
+		
+		</div>
+		<div id="quest_0" style="display: None">
 			<label>Email</label>
 			<br>
-			<input class="form-input" type="email" name="email" id="email">
+			<input class="text_input" type="email" name="email" placeholder="abc@abcdef.xyz" id="email">
 		</div>
 		<div id="questionBox">
 		</div>
 		<label id="ok" style="color: forestgreen;"></label>
 		<br>
+		<br><br><br>
 		<div class="boxBottom">
-			<button onclick="validate()">Envoyer</button>
-			<button  onclick="next()">Next</button>
+			<button id="prev" style="visibility: hidden;" onclick="prev()">Précedent</button>
+			<button id="validate" onclick="validate()" style="display: None; width: 150px">Envoyer</button>
+			<button id="next" onclick="next()">Suivant</button>
 		</div>
 	</div>
 	
 
 </div>
 
+
+<!-- Only this page css -->
 <style type="text/css">
+
+	body {
+		background-image: url({% static 'img/background.jpg' %});
+	}
 	.background {
 		width: 100%;
 		height: 100%;
@@ -29,26 +44,44 @@
 	}
 	.box {
 		color: black;
-		background: white;
+		background: #f7f7f7;
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		width: 600px;
-		min-height: 500px;
+		min-height: 400px;
 		box-shadow: 0 0 1px #ccc;
 		border: 1px solid #ccc;
 		border-radius: 13px;
 		padding: 20px;
 		clip: auto;
 	}
+	.box p {
+		font-size: 18px;
+	}
+	.box label {
+		font-size: 21px;
+	}
+	input.text_input {
+		width: 100%;
+		height: 50px;
+		margin: 10px;
+		margin-left: 0px;
+		padding: 10px;
+		font-size: 21px;
+		font-family: Arial;
+		border: 2px solid #1E0427;
+		border-radius: 8px;
+	}
 	.boxBottom {
-		background: #C4DBFF;
+		background: #fccd0d;
+		border-top: 2px solid black;
 		position: absolute;
 		top: 88%;
 		left: 50%;
 		transform: translate(-50%, 0%);
-		width: 100%;
+		width: 100.4%;
 		min-height: 60px;
 		padding: 20px;
 		margin: 0px;
@@ -58,38 +91,118 @@
 		flex-direction: row;
 	}
 	.boxBottom button {
-		padding: 10px;
-		font-size: 16px;
-		width: 150px;
+		background: white;
+		color: black;
+		padding: 12px;
+		font-size: 18px;
+		font-weight: bold;
+		font-family: Arial;
+		width: 120px;
 		border-radius: 13px;
-		border: 0px;
+		border: 2px solid black;
 	}
+	.boxBottom button#validate {
+		width: 200px;
+	}
+	.boxBottom button:hover {
+		background: #fc7935;
+		color: black;
+		border: 0px solid black;
+	}
+	@media screen and (max-width: 600px) {
+		.box {
+			color: black;
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 98%;
+			min-height: 500px;
+			box-shadow: 0 0 1px #ccc;
+			border: 1px solid #ccc;
+			border-radius: 13px;
+			padding: 20px;
+			clip: auto;
+		}
+	}
+	label {
+	  display: flex;
+	  width: 100%;
+	  cursor: pointer;
+	  font-weight: 500;
+	  position: relative;
+	  overflow: hidden;
+	  margin-bottom: 0.375em;
+	}
+	label input {
+	  position: absolute;
+	  width: 100%;
+	  left: -9999px;
+	}
+	label input:checked + span {
+		width: 100%;
+	  background-color: #d6d6e5;
+	}
+	label input:checked + span:before {
+	  box-shadow: inset 0 0 0 0.4375em #00005c;
+	}
+	label span {
+	  display: flex;
+	  align-items: center;
+	  padding: 0.375em 0.75em 0.375em 0.375em;
+	  border-radius: 99em;
+	  transition: 0.25s ease;
+	}
+	label span:hover {
+		width: 100%;
+	  background-color: #d6d6e5;
+	}
+	label span:before {
+	  display: flex;
+	  flex-shrink: 0;
+	  content: "";
+	  background-color: #fff;
+	  width: 1.5em;
+	  height: 1.5em;
+	  border-radius: 50%;
+	  margin-right: 0.375em;
+	  transition: 0.25s ease;
+	  box-shadow: inset 0 0 0 0.125em #00005c;
+	}
+
+
 </style>
 
 <script type="text/javascript">
 	var datas = {}
 	var elements = []
 	var currentElement = 0
+
+
+	// template for field
 	var checkSamples = `
-	<div>
-	  <input class="form-check-input" type="checkbox" id="check#question_id#proposal_id" onclick="valueChange(#question_id,#proposal_id)">
-	  <label class="form-check-label">#value</label>
-	</div>
+	<label class="form-check-label">
+	  <input class="form-check-input checkbox" type="checkbox" id="check#question_id#proposal_id" onclick="valueChange(#question_id,#proposal_id)">
+	  <span>
+	  #value
+	  </span>
+	</label>
 	`
 	var radioSamples = `
-	<div>
+	<label class="form-radio-label">
 	  <input class="form-radio-input" type="radio" name="radio#question_id" id="radio#question_id#proposal_id" onclick="radioValueChange(#question_id,#proposal_id)" option="#proposal_id">
-	  <label class="form-radio-label">#value</label>
-	</div>
+	  <span>#value</span>
+	</label>
 	`
 	var textSamples = `
 	<div>
-	  <input class="form-input" type="text" name="text#question_id" id="text#question_id" onchange="textValueChange(#question_id)" onkeypress="textValueChange(#question_id)">
+	  <input class="text_input" type="text" name="text#question_id" id="text#question_id" onchange="textValueChange(#question_id)" placeholder="text..." onkeypress="textValueChange(#question_id)">
 	</div>
 	`
 	var numberSamples = `
 	<div>
-	  <input class="form-input" type="number" name="number#question_id" pattern='[0-9]{10}' id="number#question_id" onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	  <input class="text_input" type="number" name="number#question_id" pattern='[0-9]{10}' id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
 	</div>
 	`
 
@@ -126,7 +239,7 @@
 			let sCheck = checkSamples.replaceAll('#question_id',e.id).replaceAll('#proposal_id',v.id).replaceAll("#value",v.libelle)
 			cs = cs + '' +sCheck
 		})
-		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h4>'+e.libelle+'</h4>'+cs+'</div>')
+		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h3>'+e.libelle+'</h3><br>'+cs+'</div>')
 		elements.push("quest_"+e.id)
 	}
 
@@ -136,18 +249,18 @@
 			let sCheck = radioSamples.replaceAll('#question_id',e.id).replaceAll('#proposal_id',v.id).replaceAll("#value",v.libelle)
 			cs = cs + '' +sCheck
 		})
-		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h4>'+e.libelle+'</h4>'+cs+'</div>')
+		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h3>'+e.libelle+'</h3><br>'+cs+'</div>')
 		elements.push("quest_"+e.id)
 	}
 
 	function addText(e) {
 		let sText = textSamples.replaceAll('#question_id',e.id)
-		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h4>'+e.libelle+'</h4>'+sText+'</div>')
+		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h3>'+e.libelle+'</h3><br>'+sText+'</div>')
 		elements.push("quest_"+e.id)
 	}
 	function addNumber(e) {
 		let sNumber = numberSamples.replaceAll('#question_id',e.id)
-		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h4>'+e.libelle+'</h4>'+sNumber+'</div>')
+		$("#questionBox").append('<div style="display: None" id="quest_'+e.id+'"><h3>'+e.libelle+'</h3><br>'+sNumber+'</div>')
 		elements.push("quest_"+e.id)
 	}
 
@@ -159,6 +272,38 @@
 		currentElement = currentElement + 1;
 		console.log("#"+elements[currentElement])
 		$("#"+elements[currentElement]).css('display', 'block')
+		console.log(elements.length, currentElement)
+		if(currentElement == elements.length - 1) {
+			$('#next').css('display','none')
+			$('#validate').css('display','block')
+		} else {
+			$('#next').css('display','block')
+			$('#validate').css('display','none')
+		}
+
+		if(currentElement > 0 && currentElement < elements.length ) {
+			$('#prev').css('visibility','visible')
+		} else {
+			$('#prev').css('visibility','hidden')
+		}
+	}
+
+	function prev() {
+		$("#"+elements[currentElement]).css('display', 'None')
+		currentElement = currentElement - 1;
+		$("#"+elements[currentElement]).css('display', 'block')
+		$('#validate').css('display','none')
+		if(currentElement == elements.length - 1) {
+			$('#next').css('display','none')
+		} else {
+			$('#next').css('display','block')
+		}
+
+		if(currentElement > 0 && currentElement < elements.length - 1) {
+			$('#prev').css('visibility','visible')
+		} else {
+			$('#prev').css('visibility','hidden')
+		}
 	}
 
 	// When user want to submit sondage
@@ -168,6 +313,7 @@
 			"sondage": sondage,
 			"responses": datas
 		}
+		console.log(data)
 		$.ajax
 	    ({
 	        type: "POST",
@@ -194,6 +340,7 @@
 			$.get('/sondage/'+sondage+'/details/', function(result){
 				$("#sondageName").text(result.sondage.libelle)
 				$("#sondageDescription").text(result.sondage.description)
+				elements.push('quest_zero')
 				elements.push("quest_0")
 				result.sondage.questions.forEach(function(e){
 					if(e.type_response == 0) {
