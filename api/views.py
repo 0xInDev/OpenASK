@@ -181,6 +181,8 @@ class ResponseViewSet(viewsets.ModelViewSet):
 	def submit(self, request):
 		data = request.data
 
+		print(json.dumps(data))
+
 		if "sondage" not in data or data['sondage'] == "":
 			return RestReponse('Sondage id required')
 

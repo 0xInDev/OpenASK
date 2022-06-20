@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-
+ 
 def logged_user(request):
     current_user = request.user 
     return current_user
