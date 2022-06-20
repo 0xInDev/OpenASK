@@ -9,7 +9,9 @@
 	<div id="questionBox">
 
 	</div>
-	<label id="ok" style="color: forestgreen;"></label>
+	<div id="ok" style="color: forestgreen;">
+		<img src="{% static 'img/7efs.gif' %}" alt="">
+	</div>
 	<br>
 	<button onclick="validate()">Envoyer</button>
 
@@ -54,7 +56,7 @@
 	`
 	var numberSamples = `
 	<div>
-	  <input class="form-input" type="number" name="number#question_id" pattern='[0-9]{10}' id="number#question_id" onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	  <input class="form-input" type="tel" name="number#question_id" pattern='[0-9]{10}' id="number#question_id" onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
 	</div>
 	`
 
