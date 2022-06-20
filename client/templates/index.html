@@ -1,8 +1,7 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<sibody style="width: 500px;"></sibody>
+<sibody style="width: 100%;"></sibody>
 
 {% endblock %}
 
@@ -11,7 +10,9 @@
 
 <script>
 	var siJs = new SiJs()
-	siJs.route('/client/question')
+	let sondage = {{ sondage.id }}
+	siJs.route('/client/sondage_content/')
 </script>
+
 
 {% endblock %}
