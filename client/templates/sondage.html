@@ -22,12 +22,12 @@
 		<div id="questionBox">
 		</div>
 		<div id="ok" class="d-none"  style="text-align: center;">
-			<img style="border-radius: 13px;" src="{% static 'img/7efs.gif' %}" alt="">
+			<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;margin: auto;"   autoplay></lottie-player>
 			<p class="text-success mt-2 ">Formulaire envoyé</p>
 		</div>
 		<br>
 		<br><br><br>
-		<div class="boxBottom">
+		<div class="boxBottom" id="boxBottom">
 			<button id="prev" style="visibility: hidden;" onclick="prev()">Précedent</button>
 			<button id="validate" onclick="validate()" style="display: None; width: 150px">Envoyer</button>
 			<button id="next" onclick="next()">Suivant</button>
@@ -61,8 +61,8 @@
 		min-height: 400px;
 		box-shadow: 0 0 1px #ccc;
 		border: 1px solid #ccc;
-		border-radius: 13px;
-		padding: 20px;
+ 		border-radius: 13px;
+ 		padding: 20px;
 		clip: auto;
 	}
 	.box p {
@@ -83,9 +83,11 @@
 		border-radius: 8px;
 	}
 	.boxBottom {
-		background:#3a4660; /* #fccd0d; */
-		border-top: 2px solid black;
+		background:#d0d0d0; /* #fccd0d; */
+		border-top: 2px solid #d0d0d0;
 		position: absolute;
+		border-bottom-left-radius: 13px;
+		border-bottom-right-radius: 13px;
 		top: 88%;
 		left: 50%;
 		transform: translate(-50%, 0%);
@@ -106,14 +108,14 @@
 		font-weight: bold;
 		font-family: Arial;
 		width: 120px;
-		border-radius: 11px;
-		border: 2px solid black;
+		border-radius: 13px;
+		border: 1px solid #d0d0d0;
 	}
 	.boxBottom button#validate {
 		width: 200px;
 	}
 	.boxBottom button:hover {
-		background:#4c669c; /* #fc7935; */
+		background:#6d727d; /* #fc7935; */
 		color: white;
 		border: 0px solid black;
 	}
@@ -134,6 +136,7 @@
 			clip: auto;
 		}
 	}
+
 	label {
 	  display: flex;
 	  width: 100%;
@@ -386,9 +389,9 @@
 	        success: function (rs) {
 	        	if("status" in rs) {
 	        		$('#questionBox').html('')
-	        		$('#ok').toggleClass("d-none")
-	        		$('#prev').css("visibility", "hidden")
-	        		$('#validate').css("visibility", "hidden")
+					$("#ok").toggleClass("d-none")
+	        		$('#ok').html('<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;margin: auto;"   autoplay></lottie-player><p class="text-success mt-2 ">Formulaire envoyé</p>')
+	        		$('#boxBottom').toggleClass("d-none")
 	        	} else {
 					$("#alert").toggleClass("d-none")
 					setTimeout(() => {
