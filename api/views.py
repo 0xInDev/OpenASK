@@ -184,16 +184,16 @@ class ResponseViewSet(viewsets.ModelViewSet):
 		print(json.dumps(data))
 
 		if "sondage" not in data or data['sondage'] == "":
-			return RestReponse('Sondage id required')
+			return RestReponse({'error':'Sondage id required'})
 
 		if "person" not in data or data['person'] == None:
-			return RestReponse('Person information required')
+			return RestReponse({'error':'Person information required'})
 
 		if "email" not in data['person'] or data['person']['email'] == "":
-			return RestReponse('Person email address required')
+			return RestReponse({'error':'Person email address required'})
 
 		if "responses" not in data or data['responses'] == None:
-			return RestReponse('No response submited')
+			return RestReponse({'error':'No response submited'})
 
 		def safeCheck(data):
 			if "first_name" not in data:
