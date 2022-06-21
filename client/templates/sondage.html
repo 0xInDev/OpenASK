@@ -1,0 +1,44 @@
+{% load static %}
+<div class="background">
+	<div style="width: 240px ;" id="alert" class="alert alert-danger alert-dismissible fade  slide-in-top p-3 d-none" role="alert">
+		Veuillez complétez le formulaire.
+	</div>
+	<div class="box">
+		<div class="box_content">
+			<img src="{% static 'img/logo_nobg.png' %}" width="100">
+			<br><br>		
+			<div id="quest_zero">
+			<h3 id="sondageName">Nom sondage</h3>
+			<br>
+			<p id="sondageDescription">Description...</p>
+			</div>
+			<div id="quest_0" style="display: None">
+				<label>Email</label>
+				<br>
+				<input class="text_input" type="email" name="email" placeholder="abc@abcdef.xyz" id="email">
+			</div>
+			<div id="questionBox">
+			</div>
+			<div id="ok" class="d-none"  style="text-align: center;">
+				<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;margin: auto;"   autoplay></lottie-player>
+				<p class="text-success mt-2 ">Formulaire envoyé</p>
+			</div>
+			<br>
+			<br><br><br>
+		</div>
+		<div class="boxBottom" id="boxBottom">
+			<button id="prev" style="visibility: hidden;" onclick="prev()">Précedent</button>
+			<button id="validate" onclick="validate()" style="display: None; width: 150px">Envoyer</button>
+			<button id="next" onclick="next()">Suivant</button>
+		</div>
+	</div>
+</div>
+
+<style>
+body {
+  width: 100%;
+  background-image: url({% static "img/background2.jpg" %});
+}
+</style>
+
+<script type="text/javascript" src="{% static 'js/main.js' %}"></script>

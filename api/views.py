@@ -181,17 +181,19 @@ class ResponseViewSet(viewsets.ModelViewSet):
 	def submit(self, request):
 		data = request.data
 
+		print(json.dumps(data))
+
 		if "sondage" not in data or data['sondage'] == "":
-			return RestReponse('Sondage id required')
+			return RestReponse({'error':'Sondage id required'})
 
 		if "person" not in data or data['person'] == None:
-			return RestReponse('Person information required')
+			return RestReponse({'error':'Person information required'})
 
 		if "email" not in data['person'] or data['person']['email'] == "":
-			return RestReponse('Person email address required')
+			return RestReponse({'error':'Person email address required'})
 
 		if "responses" not in data or data['responses'] == None:
-			return RestReponse('No response submited')
+			return RestReponse({'error':'No response submited'})
 
 		def safeCheck(data):
 			if "first_name" not in data:
@@ -238,7 +240,12 @@ class ResponseViewSet(viewsets.ModelViewSet):
 					resetResponse()
 					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
 				try:
-					QuestionResponse.objects.create(**{"choices_response": json.loads(res), "question": question, "response": response_obj})
+					print('before convert {} {}'.format(res, type(res)))
+					if type(res) == list:
+						QuestionResponse.objects.create(**{"choices_response": json.dumps(res), "question": question, "response": response_obj})
+					else:
+						resetResponse()
+						return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
 				except Exception as e:
 					resetResponse()
 					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 

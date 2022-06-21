@@ -1,0 +1,169 @@
+<div>
+	
+	<h1 id="sondageName">Nom sondage</h1>
+	<p id="sondageDescription">Description...</p>
+	<hr>
+	<label>Email</label>
+	<br>
+	<input class="form-input" type="email" name="email" id="email">
+	<div id="questionBox">
+
+	</div>
+	<div id="ok" class="d-none" style="color: forestgreen;">
+		<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;"   autoplay></lottie-player>
+	</div>
+	<br>
+	<button onclick="validate()">Envoyer</button>
+
+</div>
+
+<script type="text/javascript">
+
+	var getUrlParameter = function getUrlParameter(sParam) {
+	    var sPageURL = window.location.search.substring(1),
+	        sURLVariables = sPageURL.split('&'),
+	        sParameterName,
+	        i;
+
+	    for (i = 0; i < sURLVariables.length; i++) {
+	        sParameterName = sURLVariables[i].split('=');
+
+	        if (sParameterName[0] === sParam) {
+	            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+	        }
+	    }
+	    return false;
+	};
+
+	let sondage = getUrlParameter('sondage')
+	var datas = {}
+	var checkSamples = `
+	<div>
+	  <input class="form-check-input" type="checkbox" id="check#question_id#proposal_id" onclick="valueChange(#question_id,#proposal_id)">
+	  <label class="form-check-label">#value</label>
+	</div>
+	`
+	var radioSamples = `
+	<div>
+	  <input class="form-radio-input" type="radio" name="radio#question_id" id="radio#question_id#proposal_id" onclick="radioValueChange(#question_id,#proposal_id)" option="#proposal_id">
+	  <label class="form-radio-label">#value</label>
+	</div>
+	`
+	var textSamples = `
+	<div>
+	  <input class="form-input" type="text" name="text#question_id" id="text#question_id" onchange="textValueChange(#question_id)" onkeypress="textValueChange(#question_id)">
+	</div>
+	`
+	var numberSamples = `
+	<div>
+	  <input class="form-input" type="tel" name="number#question_id" id="number#question_id" onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	</div>
+	`
+
+	// Function for detecting field change
+	function valueChange(question_id, proposal_id) {
+		if(datas[question_id].indexOf(proposal_id) !== -1) {
+			datas[question_id] = datas[question_id].filter(function(e) { return e !== proposal_id })
+		} else {
+			datas[question_id].push(proposal_id)
+		}
+	}
+
+	function radioValueChange(question_id, proposal_id) {
+		let widget = $("#radio"+question_id+""+proposal_id)
+		datas[question_id] = proposal_id
+	}
+
+	function textValueChange(question_id) {
+		datas[question_id] = $("#text"+question_id).val()
+	}
+
+	function numberValueChange(question_id) {
+		if(!parseInt($("#number"+question_id).val())) {
+			$("#number"+question_id).val
+		}
+		datas[question_id] = parseInt($("#number"+question_id).val())
+	}
+
+
+	// Function for add new field
+	function addCheckBox(e) {
+		let cs = ''
+		e.response_proposal.forEach(function(v) {
+			let sCheck = checkSamples.replaceAll('#question_id',e.id).replaceAll('#proposal_id',v.id).replaceAll("#value",v.libelle)
+			cs = cs + '' +sCheck
+		})
+		$("#questionBox").append('<div><h4>'+e.libelle+'</h4>'+cs+'</div>')
+	}
+
+	function addRadio(e) {
+		let cs = ''
+		e.response_proposal.forEach(function(v) {
+			let sCheck = radioSamples.replaceAll('#question_id',e.id).replaceAll('#proposal_id',v.id).replaceAll("#value",v.libelle)
+			cs = cs + '' +sCheck
+		})
+		$("#questionBox").append('<div><h4>'+e.libelle+'</h4>'+cs+'</div>')
+	}
+
+	function addText(e) {
+		let sText = textSamples.replaceAll('#question_id',e.id)
+		$("#questionBox").append('<div><h4>'+e.libelle+'</h4>'+sText+'</div>')
+	}
+	function addNumber(e) {
+		let sNumber = numberSamples.replaceAll('#question_id',e.id)
+		$("#questionBox").append('<div><h4>'+e.libelle+'</h4>'+sNumber+'</div>')
+	}
+
+	// When user want to submit sondage
+	function validate() {
+		let data = {
+			"person": {"email": $("#email").val()},
+			"sondage": sondage,
+			"responses": datas
+		}
+		$.ajax
+	    ({
+	        type: "POST",
+	        url: '/response/submit/',
+	        dataType: 'json',
+	        contentType: 'application/json',
+	        async: false,
+	        data: JSON.stringify(data),
+	        success: function (rs) {
+	        	if("status" in rs) {
+	        		$('#questionBox').html('')
+	        		$('#ok').text('Formulaire envoyé')
+	        	} else {
+	        		console.log(rs)
+	        	}
+	        	
+	        }
+	    })
+	}
+
+	// Fetch sondage and create html element
+	if(sondage != null)
+		$.get('/sondage/'+sondage+'/details/', function(result){
+			$("#sondageName").text(result.sondage.libelle)
+			$("#sondageDescription").text(result.sondage.description)
+			result.sondage.questions.forEach(function(e){
+				if(e.type_response == 0) {
+					datas[e.id] = null
+					addRadio(e)
+				}
+				else if(e.type_response == 1) {
+					datas[e.id] = []
+					addCheckBox(e)
+				}
+				else if(e.type_response == 2) {
+					datas[e.id] = ""
+					addText(e)
+				}
+				else if(e.type_response == 3) {
+					datas[e.id] = null
+					addNumber(e)
+				}
+			})
+		})
+
+</script>	

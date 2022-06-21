@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<sibody style="width: 100%;"></sibody>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+	var siJs = new SiJs()
+	let sondage = {{ sondage.id }}
+	siJs.route('/client/sondage_content/')
+</script>
+
+
+{% endblock %}
