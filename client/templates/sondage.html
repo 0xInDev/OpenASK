@@ -1,5 +1,9 @@
 {% load static %}
 <div class="background">
+	<div style="width: 240px ;" id="alert" class="alert alert-danger alert-dismissible fade  slide-in-top p-3 d-none" role="alert">
+		Veuillez complétez le formulaire.
+		
+	</div>
 	<canvas id='c'></canvas>
 	<div class="box">
 		<img src="{% static 'img/logo.png' %}" width="100">
@@ -17,10 +21,13 @@
 		</div>
 		<div id="questionBox">
 		</div>
-		<label id="ok" style="color: forestgreen;"></label>
+		<div id="ok" class="d-none"  style="text-align: center;">
+			<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;margin: auto;"   autoplay></lottie-player>
+			<p class="text-success mt-2 ">Formulaire envoyé</p>
+		</div>
 		<br>
 		<br><br><br>
-		<div class="boxBottom">
+		<div class="boxBottom" id="boxBottom">
 			<button id="prev" style="visibility: hidden;" onclick="prev()">Précedent</button>
 			<button id="validate" onclick="validate()" style="display: None; width: 150px">Envoyer</button>
 			<button id="next" onclick="next()">Suivant</button>
@@ -35,6 +42,7 @@
 <style type="text/css">
 
 	body {
+		width: 100%;
 		background-image: url({% static 'img/background.jpg' %});
 	}
 	.background {
@@ -53,8 +61,8 @@
 		min-height: 400px;
 		box-shadow: 0 0 1px #ccc;
 		border: 1px solid #ccc;
-		border-radius: 13px;
-		padding: 20px;
+ 		border-radius: 13px;
+ 		padding: 20px;
 		clip: auto;
 	}
 	.box p {
@@ -75,9 +83,11 @@
 		border-radius: 8px;
 	}
 	.boxBottom {
-		background: #fccd0d;
-		border-top: 2px solid black;
+		background:#d0d0d0; /* #fccd0d; */
+		border-top: 2px solid #d0d0d0;
 		position: absolute;
+		border-bottom-left-radius: 13px;
+		border-bottom-right-radius: 13px;
 		top: 88%;
 		left: 50%;
 		transform: translate(-50%, 0%);
@@ -99,14 +109,14 @@
 		font-family: Arial;
 		width: 120px;
 		border-radius: 13px;
-		border: 2px solid black;
+		border: 1px solid #d0d0d0;
 	}
 	.boxBottom button#validate {
 		width: 200px;
 	}
 	.boxBottom button:hover {
-		background: #fc7935;
-		color: black;
+		background:#6d727d; /* #fc7935; */
+		color: white;
 		border: 0px solid black;
 	}
 	@media screen and (max-width: 600px) {
@@ -126,6 +136,7 @@
 			clip: auto;
 		}
 	}
+
 	label {
 	  display: flex;
 	  width: 100%;
@@ -170,7 +181,47 @@
 	  transition: 0.25s ease;
 	  box-shadow: inset 0 0 0 0.125em #00005c;
 	}
+	.alert{
+		margin: auto;
+		z-index: 2;
+	}
+	.slide-in-top {
+	-webkit-animation: slide-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	animation: slide-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	}
 
+	/**
+	* ----------------------------------------
+	* animation slide-in-top
+	* ----------------------------------------
+	*/
+	@-webkit-keyframes slide-in-top {
+		0% {
+		-webkit-transform: translateY(-1000px);
+				transform: translateY(-1000px);
+		opacity: 0;
+		}
+		100% {
+		-webkit-transform: translateY(0);
+				transform: translateY(0);
+		opacity: 1;
+		}
+	}
+	@keyframes slide-in-top {
+		0% {
+		-webkit-transform: translateY(-1000px);
+				transform: translateY(-1000px);
+		opacity: 0;
+		}
+		100% {
+		-webkit-transform: translateY(0);
+				transform: translateY(0);
+		opacity: 1;
+		}
+	}
+
+
+  
 
 </style>
 
@@ -202,7 +253,7 @@
 	`
 	var numberSamples = `
 	<div>
-	  <input class="text_input" type="number" name="number#question_id" pattern='[0-9]{10}' id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	  <input class="text_input" type="number" onkeydown="return isNumberKey(event)" name="number#question_id"  id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
 	</div>
 	`
 
@@ -212,6 +263,19 @@
 			datas[question_id] = datas[question_id].filter(function(e) { return e !== proposal_id })
 		} else {
 			datas[question_id].push(proposal_id)
+		}
+	}
+
+	function isNumberKey(evt) {
+		var charCode =  event.key;
+		number = ['0','1','2','3','4','5','6','7','8','9', 'Backspace']
+		
+		if(evt.target.value.length > 15 && charCode != 'Backspace'){return false}
+
+		if (number.includes(charCode))
+			return true;
+		else{
+			return false;
 		}
 	}
 
@@ -325,8 +389,14 @@
 	        success: function (rs) {
 	        	if("status" in rs) {
 	        		$('#questionBox').html('')
-	        		$('#ok').text('Formulaire envoyé')
+					$("#ok").toggleClass("d-none")
+	        		$('#ok').html('<lottie-player src="https://assets2.lottiefiles.com/packages/lf20_unahkkgk.json"  background="transparent"  speed="1"  style="width: 240px; height: 240px;margin: auto;"   autoplay></lottie-player><p class="text-success mt-2 ">Formulaire envoyé</p>')
+	        		$('#boxBottom').toggleClass("d-none")
 	        	} else {
+					$("#alert").toggleClass("d-none")
+					setTimeout(() => {
+						$("#alert").toggleClass("d-none")
+					}, 2000);
 	        		console.log(rs)
 	        	}
 	        	
