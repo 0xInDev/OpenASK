@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'client',
+    'dashboard',
     'django_filters',
 ]
 
