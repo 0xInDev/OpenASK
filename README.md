@@ -10,7 +10,7 @@ python manage.py makemigrations api
 python manage.py migrate
 ```
 
-# for create a user
+# for user creation
 
 ```bash
 python manage.py createsuperuser
