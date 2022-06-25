@@ -51,7 +51,7 @@ class SondageViewSet(viewsets.ModelViewSet):
 	filter_backends = [DjangoFilterBackend]
 	serializer_class = SondageSerializer
 	pagination_class = None
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 	@action(detail=True)
 	def result(self, request, pk=None):
@@ -119,7 +119,7 @@ class SondageViewSet(viewsets.ModelViewSet):
 
 class QuestionViewSet(viewsets.ModelViewSet):
 	filter_backends = [DjangoFilterBackend]
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.IsAdminUser]
 	queryset = Question.objects.all()
 	pagination_class = None
 	serializer_class = QuestionGetSerializer
@@ -140,7 +140,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 class ResponseProposalViewSet(viewsets.ModelViewSet):
 	filter_backends = [DjangoFilterBackend]
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	queryset = ResponseProposal.objects.all()
 	pagination_class = None
 	serializer_class = ResponseProposalGetSerializer
@@ -160,7 +160,7 @@ class ResponseProposalViewSet(viewsets.ModelViewSet):
 
 class PersonViewSet(viewsets.ModelViewSet):
 	filter_backends = [DjangoFilterBackend]
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.IsAdminUser]
 	queryset = Person.objects.all()
 	pagination_class = None
 	serializer_class = PersonSerializer
@@ -285,7 +285,7 @@ class ResponseViewSet(viewsets.ModelViewSet):
 
 class QuestionResponseViewSet(viewsets.ModelViewSet):
 	filter_backends = [DjangoFilterBackend]
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [permissions.IsAdminUser]
 	queryset = QuestionResponse.objects.all()
 	pagination_class = None
 	serializer_class = QuestionResponseGetSerializer
