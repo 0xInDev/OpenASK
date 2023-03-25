@@ -14,6 +14,7 @@ class Sondage(models.Model):
         Verificaiton level 3 : Email verification with validation code is asked.
 
     """
+    url_slug = models.CharField(max_length=255, unique=True, default="(NIL)")
     libelle = models.CharField(max_length=255)
     description = models.TextField(null=True)
     verification = models.IntegerField(choices=((1, 'NO VERIFICATION'), (2, 'MI-STRICT'), (3, 'STRICT')), default=0)
