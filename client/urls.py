@@ -5,5 +5,4 @@ urlpatterns = [
     path('', views.index),
     path('sondage/<str:slug>', views.sondage),
     path('sondage_content/', views.sondage_data),
-    path('question/', views.question)
 ]

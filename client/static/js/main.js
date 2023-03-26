@@ -24,10 +24,29 @@ var textSamples = `
 	`;
 var numberSamples = `
 	<div>
-	  <input class="text_input" type="number" onkeydown="return isNumberKey(event)" name="number#question_id"  id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
+	  <input class="text_input" typePerson information required="number" onkeydown="return isNumberKey(event)" name="number#question_id"  id="number#question_id"  placeholder="123..." onchange="numberValueChange(#question_id)" onkeypress="numberValueChange(#question_id)">
 	</div>
 	`;
 
+
+function getCodeMessage(code) {
+	switch(code) {
+	case 10001:
+		return "Sondage id required"
+	case 10002:
+		return "Person information required"
+	case 10003:
+		return "Person email address required"
+	case 10004:
+		return "No response submited"
+	case 10005:
+		return "This person already reply to this sondage"
+	case 10006:
+		return "Innexistante question replied"
+	case 10007:
+		return "Bad Response type for some question"
+	}
+}
 // Function for detecting field change
 function valueChange(question_id, proposal_id) {
 	if (datas[question_id].indexOf(proposal_id) !== -1) {
@@ -204,10 +223,12 @@ function validate() {
 				);
 				$("#boxBottom").toggleClass("d-none");
 			} else {
+				$("#alert").text(getCodeMessage(rs.code))
 				$("#alert").toggleClass("d-none");
 				setTimeout(() => {
 					$("#alert").toggleClass("d-none");
-				}, 2000);
+
+				}, 3000);
 				console.log(rs);
 			}
 		},

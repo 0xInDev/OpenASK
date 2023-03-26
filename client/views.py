@@ -14,6 +14,3 @@ def sondage(request, slug):
 
 def sondage_data(request):
 	return render(request, 'sondage.html')
-
-def question(request):
-	return render(request, 'question.html', {"sondage": Sondage.objects.all()})
