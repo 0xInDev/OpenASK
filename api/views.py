@@ -187,8 +187,9 @@ class ResponseViewSet(viewsets.ModelViewSet):
 		if "person" not in data or data['person'] == None:
 			return RestReponse({'error':'Person information required', 'code': ErrorCode.SONDAGE_PERSON_INFORMATION_MISSING})
 
-		if "email" not in data['person'] or data['person']['email'] == "":
-			return RestReponse({'error':'Person email address required', 'code': ErrorCode.SONDAGE_PERSON_EMAIL_MISSING})
+		if ("email" not in data['person'] or data['person']['email'] == ""):
+			if "phone_number" not in data['person'] or data['person']['phone_number'] == "":
+				return RestReponse({'error':'Person email address required', 'code': ErrorCode.SONDAGE_PERSON_EMAIL_MISSING})
 
 		if "responses" not in data or data['responses'] == None:
 			return RestReponse({'error':'No response submited', 'code': ErrorCode.SONDAGE_RESPONSE_MISSING})
@@ -201,7 +202,15 @@ class ResponseViewSet(viewsets.ModelViewSet):
 			return data
 
 		sondage = Sondage.objects.filter(id=int(data['sondage'])).first()
-		check_existing_person = Person.objects.filter(email=data['person']['email'])
+		if "email" in data['person']:
+			if data['person']['email'] != "":
+				check_existing_person = Person.objects.filter(email=data['person']['email'])
+		elif "phone_number" in data['person']:
+			if data['person']['phone_number'] != "":
+				check_existing_person = Person.objects.filter(phone_number=data['person']['phone_number'])
+		else:
+			check_existing_person = Person.objects.filter(email="unknown mail")
+			return RestReponse({'error':'No mail and no phone number submitted', 'code': ErrorCode.SONDAGE_NO_MAIL_NO_PHONE_NUMBER})
 		isNewPerson = False
 		if len(check_existing_person) > 0:
 			person = check_existing_person.first()
