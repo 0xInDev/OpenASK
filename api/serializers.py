@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth.hashers import make_password
+from django.utils.text import slugify
 from .models import *
 from rest_framework import serializers
 
@@ -53,6 +54,7 @@ class SondageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['author'] = self.context['request'].user
+        validated_data['url_slug'] = slugify(validated_data['libelle'])
         return super(SondageSerializer, self).create(validated_data)
 
 

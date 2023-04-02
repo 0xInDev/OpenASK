@@ -14,6 +14,7 @@ class Sondage(models.Model):
         Verificaiton level 3 : Email verification with validation code is asked.
 
     """
+    url_slug = models.CharField(max_length=255, unique=True, default="(NIL)")
     libelle = models.CharField(max_length=255)
     description = models.TextField(null=True)
     verification = models.IntegerField(choices=((1, 'NO VERIFICATION'), (2, 'MI-STRICT'), (3, 'STRICT')), default=0)
@@ -41,6 +42,7 @@ class Question(models.Model):
 class Person(models.Model):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.CharField(max_length=255, null=True, blank=True)
     email = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):

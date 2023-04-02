@@ -6,11 +6,11 @@ from api.models import Sondage
 def index(request):
 	return render(request, 'index.html', {})
 
-def sondage(request, id):
-	return render(request, 'index.html', {"sondage": Sondage.objects.filter(id=id).first()})
+def sondage(request, slug):
+	slug = Sondage.objects.filter(url_slug=slug)
+	if len(slug) == 0:
+		return render(request, '404.html')
+	return render(request, 'index.html', {"sondage": slug.first()})
 
 def sondage_data(request):
 	return render(request, 'sondage.html')
-
-def question(request):
-	return render(request, 'question.html', {"sondage": Sondage.objects.all()})

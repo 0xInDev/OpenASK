@@ -181,19 +181,18 @@ class ResponseViewSet(viewsets.ModelViewSet):
 	def submit(self, request):
 		data = request.data
 
-		print(json.dumps(data))
-
 		if "sondage" not in data or data['sondage'] == "":
-			return RestReponse({'error':'Sondage id required'})
+			return RestReponse({'error':'Sondage id required', 'code': ErrorCode.SONDAGE_ID_MISSING})
 
 		if "person" not in data or data['person'] == None:
-			return RestReponse({'error':'Person information required'})
+			return RestReponse({'error':'Person information required', 'code': ErrorCode.SONDAGE_PERSON_INFORMATION_MISSING})
 
-		if "email" not in data['person'] or data['person']['email'] == "":
-			return RestReponse({'error':'Person email address required'})
+		if ("email" not in data['person'] or data['person']['email'] == ""):
+			if "phone_number" not in data['person'] or data['person']['phone_number'] == "":
+				return RestReponse({'error':'Person email address required', 'code': ErrorCode.SONDAGE_PERSON_EMAIL_MISSING})
 
 		if "responses" not in data or data['responses'] == None:
-			return RestReponse({'error':'No response submited'})
+			return RestReponse({'error':'No response submited', 'code': ErrorCode.SONDAGE_RESPONSE_MISSING})
 
 		def safeCheck(data):
 			if "first_name" not in data:
@@ -203,12 +202,20 @@ class ResponseViewSet(viewsets.ModelViewSet):
 			return data
 
 		sondage = Sondage.objects.filter(id=int(data['sondage'])).first()
-		check_existing_person = Person.objects.filter(email=data['person']['email'])
+		if "email" in data['person']:
+			if data['person']['email'] != "":
+				check_existing_person = Person.objects.filter(email=data['person']['email'])
+		elif "phone_number" in data['person']:
+			if data['person']['phone_number'] != "":
+				check_existing_person = Person.objects.filter(phone_number=data['person']['phone_number'])
+		else:
+			check_existing_person = Person.objects.filter(email="unknown mail")
+			return RestReponse({'error':'No mail and no phone number submitted', 'code': ErrorCode.SONDAGE_NO_MAIL_NO_PHONE_NUMBER})
 		isNewPerson = False
 		if len(check_existing_person) > 0:
 			person = check_existing_person.first()
 			if len(Response.objects.filter(person=person)) > 0:
-				return RestReponse({'error':'This person already reply to this sondage'})
+				return RestReponse({'error':'This person already reply to this sondage', 'code': ErrorCode.SONDAGE_PERSON_ALREADY_REPLY})
 			else:
 				isNewPerson = False
 		else:
@@ -223,50 +230,49 @@ class ResponseViewSet(viewsets.ModelViewSet):
 			question = Question.objects.filter(id=response)
 			if len(question) == 0:
 				resetResponse()
-				return RestReponse({'error':'Innexistante question; question_id => {}; response => {}'.format(response, data['responses'][response])})
+				return RestReponse({'error':'Innexistante question; question_id => {}; response => {}'.format(response, data['responses'][response]), 'code': ErrorCode.SONDAGE_QUESTION_NOT_EXIST})
 			question = question.first()
 			res = data['responses'][response]
 			if question.type_response == 0:
 				if res == "" or res == None:
 					resetResponse()
-					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
+					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response]), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 				try:
 					QuestionResponse.objects.create(**{"choice_response": int(res), "question": question, "response": response_obj})
 				except Exception as e:
 					resetResponse()
-					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
+					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 			elif question.type_response == 1:
 				if res == "" or res == None:
 					resetResponse()
-					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
+					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response]), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 				try:
-					print('before convert {} {}'.format(res, type(res)))
 					if type(res) == list:
 						QuestionResponse.objects.create(**{"choices_response": json.dumps(res), "question": question, "response": response_obj})
 					else:
 						resetResponse()
-						return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
+						return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 				except Exception as e:
 					resetResponse()
-					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
+					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 			elif question.type_response == 2:
 				if res == "" or res == None:
 					resetResponse()
-					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
+					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response]), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 				try:
 					QuestionResponse.objects.create(**{"text_response": res, "question": question, "response": response_obj})
 				except Exception as e:
 					resetResponse()
-					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
+					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 			elif question.type_response == 3:
 				if res == "" or res == None:
 					resetResponse()
-					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response])}) 
+					return RestReponse({'error':'Bad Response; question_id => {}; response => {}'.format(response, data['responses'][response]), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 				try:
 					QuestionResponse.objects.create(**{"number_response": int(res), "question": question, "response": response_obj})
 				except Exception as e:
 					resetResponse()
-					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e)}) 
+					return RestReponse({'error':'Bad Response type; question_id => {}; response => {}; {}'.format(response, data['responses'][response], e), 'code': ErrorCode.SONDAGE_BAD_QUESTION_RESPONSE_TYPE}) 
 
 		return RestReponse({"status": 200})
 
