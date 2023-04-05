@@ -55,6 +55,8 @@ class SondageViewSet(viewsets.ModelViewSet):
 
 	@action(detail=True)
 	def result(self, request, pk=None):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
 		sondage = self.get_object()
 		data = {}
 		data['sondage'] = SondageSerializer(sondage, context={"request":request}).data
@@ -277,11 +279,38 @@ class ResponseViewSet(viewsets.ModelViewSet):
 		return RestReponse({"status": 200})
 
 	def list(self, request):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
 		if "sondage" in request.GET and request.GET['sondage'] != "":
 			return super().list(self, request)
 		else:
 			serializer = self.get_serializer_class()(Response.objects.none(), many=True)
 			return RestReponse(serializer.data)
+		
+	def retrieve(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().retrieve(request, *args, **kwargs)
+	
+	def create(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().create(request, *args, **kwargs)
+	
+	def update(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().update(request, *args, **kwargs)
+	
+	def partial_update(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().partial_update(request, *args, **kwargs)
+	
+	def destroy(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().destroy(request, *args, **kwargs)
 
 	def get_serializer_class(self):
 		if self.request.method == 'POST':
