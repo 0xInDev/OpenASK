@@ -60,30 +60,24 @@ class SondageViewSet(viewsets.ModelViewSet):
 		sondage = self.get_object()
 		data = {}
 		data['sondage'] = SondageSerializer(sondage, context={"request":request}).data
-		_questions = []
-		for question in Question.objects.filter(sondage=sondage):
-			_questions.append({
-					"id": question.id, 
-					"libelle": question.libelle, 
-					"type_response": question.type_response
-				})
 		_responses = []
 
 		for response in Response.objects.filter(sondage=sondage):
 			_response_data = {}
 			_response_data['author'] = PersonSerializer(response.person, context={"request":request}).data
+			_response_data['created_at'] = response.created_at
 			_author_response = []
 			for question_response in QuestionResponse.objects.filter(response=response):
 				question = question_response.question
 				_question_response_data = {"question_libelle":question.libelle, "question_id": question.id}
 				if question.type_response == 0:
-					_question_response_data['response'] = int(question_response.choice_response)
+					_question_response_data['response_value'] = ResponseProposalGetSerializer(ResponseProposal.objects.filter(id=question_response.choice_response), many=True).data[0]
 				elif question.type_response == 1:
-					_question_response_data['response'] = json.loads(question_response.choices_response)
+					_question_response_data['response_value'] = ResponseProposalGetSerializer(ResponseProposal.objects.filter(id__in=json.loads(question_response.choices_response)), many=True).data[0]
 				elif question.type_response == 2:
-					_question_response_data['response'] = question_response.text_response
+					_question_response_data['response_value'] = {"libelle":question_response.text_response, "id": question_response.id, "question": QuestionGetSerializer(question, context={'request': request}).data}
 				elif question.type_response == 3:
-					_question_response_data['response'] = int(question_response.number_response)
+					_question_response_data['response_value'] = {"libelle":question_response.number_response, "id": question_response.id, "question": QuestionGetSerializer(question, context={'request': request}).data}
 				else:
 					_question_response_data['response'] = {"status": "Failed to understand this answer"}
 				_author_response.append(_question_response_data)
@@ -91,9 +85,6 @@ class SondageViewSet(viewsets.ModelViewSet):
 			_response_data['author_response'] = _author_response
 			_responses.append(_response_data)
 
-
-
-		data['sondage']['questions'] = _questions
 		data['sondage']['responses'] = _responses
 		return RestReponse(data)
 	@action(detail=True)
