@@ -1,11 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
-  // ssr: false,
-  publicPath: '/dashboard/_nuxt/',
-  static: {
-    prefix: true
-  },
   css: [
     'vuetify/lib/styles/main.sass', 
     '@mdi/font/css/materialdesignicons.min.css'
@@ -17,5 +12,10 @@ export default defineNuxtConfig({
     define: {
       'process.env.DEBUG': false,
     },
+  },
+  runtimeConfig: {
+    public: {
+      API_URL: 'http://127.0.0.1:8000'
+    }
   },
 })

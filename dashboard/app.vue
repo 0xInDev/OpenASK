@@ -1,5 +1,6 @@
 <script>
   import axios from 'axios';
+
   export default {
     data () {
       return {
@@ -15,10 +16,11 @@
         errorMesaage: '',
         loggedIn: false,
         loading: false,
-        apiUrl: 'https://sondage.indevgroup.net/'
+        apiUrl: this.$config.public.API_URL ?? 'http://127.0.0.1:8000'
       }
     },
     mounted () {
+      console.log(this.$config.public.API_URL)
       if (localStorage.getItem('token') !== null && localStorage.getItem('token') !== 'undefined') {
         this.dialog = false
         this.loggedIn = true
@@ -113,7 +115,7 @@
       </v-app-bar>
       
       <v-row v-if="loggedIn">
-        <v-col cols="12">
+        <v-col cols="12" v-if="Sondage.length > 0">
           <v-container 
             fluid
             class="ma-0 d-flex pt-4 mt-16"
