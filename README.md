@@ -24,12 +24,16 @@ Pour toute question ou suggestion concernant OpenASK, n'hésitez pas à nous con
 ## Installation of requirements
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install virtualenv
+virtualenv .env
+// Linux & Macos
+source ./env/bin/activate
+// Windows
+.env/Scripts/activate
+pip -m pip install -r requirements.txt
 
 python manage.py makemigrations
-
 python manage.py makemigrations api
-
 python manage.py migrate
 ```
 
