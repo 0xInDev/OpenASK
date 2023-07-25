@@ -55,33 +55,29 @@ class SondageViewSet(viewsets.ModelViewSet):
 
 	@action(detail=True)
 	def result(self, request, pk=None):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
 		sondage = self.get_object()
 		data = {}
 		data['sondage'] = SondageSerializer(sondage, context={"request":request}).data
-		_questions = []
-		for question in Question.objects.filter(sondage=sondage):
-			_questions.append({
-					"id": question.id, 
-					"libelle": question.libelle, 
-					"type_response": question.type_response
-				})
 		_responses = []
 
 		for response in Response.objects.filter(sondage=sondage):
 			_response_data = {}
 			_response_data['author'] = PersonSerializer(response.person, context={"request":request}).data
+			_response_data['created_at'] = response.created_at
 			_author_response = []
 			for question_response in QuestionResponse.objects.filter(response=response):
 				question = question_response.question
 				_question_response_data = {"question_libelle":question.libelle, "question_id": question.id}
 				if question.type_response == 0:
-					_question_response_data['response'] = int(question_response.choice_response)
+					_question_response_data['response_value'] = ResponseProposalGetSerializer(ResponseProposal.objects.filter(id=question_response.choice_response), many=True).data[0]
 				elif question.type_response == 1:
-					_question_response_data['response'] = json.loads(question_response.choices_response)
+					_question_response_data['response_value'] = ResponseProposalGetSerializer(ResponseProposal.objects.filter(id__in=json.loads(question_response.choices_response)), many=True).data[0]
 				elif question.type_response == 2:
-					_question_response_data['response'] = question_response.text_response
+					_question_response_data['response_value'] = {"libelle":question_response.text_response, "id": question_response.id, "question": QuestionGetSerializer(question, context={'request': request}).data}
 				elif question.type_response == 3:
-					_question_response_data['response'] = int(question_response.number_response)
+					_question_response_data['response_value'] = {"libelle":question_response.number_response, "id": question_response.id, "question": QuestionGetSerializer(question, context={'request': request}).data}
 				else:
 					_question_response_data['response'] = {"status": "Failed to understand this answer"}
 				_author_response.append(_question_response_data)
@@ -89,9 +85,6 @@ class SondageViewSet(viewsets.ModelViewSet):
 			_response_data['author_response'] = _author_response
 			_responses.append(_response_data)
 
-
-
-		data['sondage']['questions'] = _questions
 		data['sondage']['responses'] = _responses
 		return RestReponse(data)
 	@action(detail=True)
@@ -277,11 +270,38 @@ class ResponseViewSet(viewsets.ModelViewSet):
 		return RestReponse({"status": 200})
 
 	def list(self, request):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
 		if "sondage" in request.GET and request.GET['sondage'] != "":
 			return super().list(self, request)
 		else:
 			serializer = self.get_serializer_class()(Response.objects.none(), many=True)
 			return RestReponse(serializer.data)
+		
+	def retrieve(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().retrieve(request, *args, **kwargs)
+	
+	def create(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().create(request, *args, **kwargs)
+	
+	def update(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().update(request, *args, **kwargs)
+	
+	def partial_update(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().partial_update(request, *args, **kwargs)
+	
+	def destroy(self, request, *args, **kwargs):
+		if request.user.is_superuser == False:
+			return HttpResponse("nothing")
+		return super().destroy(request, *args, **kwargs)
 
 	def get_serializer_class(self):
 		if self.request.method == 'POST':

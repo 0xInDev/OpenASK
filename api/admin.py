@@ -8,3 +8,9 @@ def register(model):
         pass
     admin.site.register(model, AdminModel)
 
+register(Sondage)
+register(Question)
+register(QuestionResponse)
+register(ResponseProposal)
+register(Person)
+register(Response)
