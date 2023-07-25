@@ -44,3 +44,7 @@ python manage.py createsuperuser
 ```bash
 python manage.py runserver
 ```
+# How to contribute
+- Clone the project
+- Add some edits
+- Git commits & push 
